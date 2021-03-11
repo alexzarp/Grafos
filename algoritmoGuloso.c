@@ -1,18 +1,37 @@
 #include <stdio.h>
 
-int ligacao(int *mat[], int partiu, int chegou) {
-    int valor, soma;
-    for (int i=0; i<7; i++){
-        //mat = mat[i][partiu];
-
-        for (int j=0; j<7; j++){
-            if (mat[i][j] != 0) {
-                if (valor <= mat[i][j]){
-
+int ligacao(int *mat[], int a, int b, int c, int d) {
+    for(int i=a; i<7; i++){
+        for(int j=b; j<7; j++){
+          // ????   if((mat[i][j] <= mat[a][c]) && != 0)
+            if((mat[i][j] <= mat[a][c]) != 0){
+                a = i; c = j;
+                if ((a == c) && (b == d)){
+                    return 1;
+                } else {
+                    ligacao(mat, a,b,c,d);
                 }
             }
         }
     }
+    return 0;
+}
+
+int ligacao(int *mat[], int a, int b, int c, int d, int n_passos) {
+    for(int i=a; i<7; i++){
+        for(int j=b; j<7; j++){
+          // ????   if((mat[i][j] <= mat[a][c]) && != 0)
+            if((mat[i][j] <= mat[a][c]) != 0){
+                a = i; c = j;
+                if ((a == c) && (b == d)){
+                    return 1;
+                } else {
+                    ligacao(mat, a,b,c,d);
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 //                                (0)(1)(2)(3)(4)(5)(6)
@@ -26,11 +45,13 @@ int main() {//                     1  2  3  4  5  6  7
                          /*(6) 7*/{0, 0, 0, 0, 0, 0, 0}          //20  21  22  23
     };                                                           //30  31  32  33
     
-    int partiu, chegou;
-    printf("Partida,chegada: ");
-    scanf("%d", &partiu, &chegou);
+    int a,b,c,d;
+    //printf("Grafos disponíveis são: ");
+    printf("[Part,ida][cheg,ada]: ");
+    scanf("[%d,%d][%d,%d]",&a,&b,&c,&d);
 
-    if (ligacao(matAdja, partiu, chegou) == 1) 
+    //pra não criar confusão na minha cabeça
+    if (ligacao(&matAdja, a-1,b-1,c-1,d-1))
         printf("Objetivo alcançado");
     else
         printf("Não o encontrei");
