@@ -14,28 +14,50 @@ int exploraGrafo (int matrizAdj[][7], int origem, int destino, int numeroPassos,
 
 	return
 */
-int ligacao(int mat[7][7], int origem, int destino, int maxPassos) {
-    int i = origem, j=0;
-    int numPassos, aux;
-    for (j; j<7; j++){
-        if(origem >= mat[i][j]){
-            printf("Estou em {%d,%d}", i,j);
-            origem = mat[i][j];
-        }
-    }
-    origem = j;
-    if (i == destino){
-        return 1;
-    } else {
-        if (numPassos <= maxPassos)
-            return 0;
-        else if (maxPassos <= countpassos) 
-            return -1;
-    }
-    
-    ligacao(mat,origem,destino,numPassos++,maxPassos,linha);
-}
+// Faltou muita coisa, e não consegui fazer funcionar nem a parte lógica principal.
 
+// int ligacao(int mat[7][7], int origem, int destino, int maxPassos) {
+//     int i = origem, j=0;
+//     int numPassos, aux;
+//     for (j; j<7; j++){
+//         if(origem >= mat[i][j]){
+//             printf("Estou em {%d,%d}", i,j);
+//             origem = mat[i][j];
+//         }
+//     }
+//     origem = j;
+//     if (i == destino){
+//         return 1;
+//     } else {
+//         if (numPassos <= maxPassos)
+//             return 0;
+//         else if (maxPassos <= countpassos) 
+//             return -1;
+//     }
+    
+//     ligacao(mat,origem,destino,maxPassos);
+// }
+
+int gordo (int mat[][7], int origem, int destino, int numPassos, int numMax){
+	int melhorEscolha = -1; 
+	int j;// → Coluna 
+	
+	if (numMax < numPassos)
+		return 0;
+
+	for (j = 0; j < numMax; j++) 
+		if (mat[origem][j] > 0 && j != origem)
+            if (melhorEscolha == -1 || mat[origem][melhorEscolha] > mat[origem][j]) 
+                melhorEscolha = j;
+
+    if (destino == melhorEscolha)
+        return 1;
+    
+    if (melhorEscolha > -1)
+        return gordo(mat, melhorEscolha, destino, numPassos++, numMax);
+
+    return -1;
+}
 
 //                                (0)(1)(2)(3)(4)(5)(6)
 int main() {//                     1  2  3  4  5  6  7
@@ -53,14 +75,14 @@ int main() {//                     1  2  3  4  5  6  7
     printf("Partida,chegada: ");
     scanf("%d,%d",&partida,&chegada);
     
-    int busca = ligacao(matAdja, partida,chegada,7);
+    int busca = gordo(matAdja, partida-1,chegada-1,4, 7);
     
-    if (busca > 0)
-        printf("Objetivo alcançado\n");
-    else if (busca == 0)
-        printf("Cansei, impossível fazer com Guloso\n");
+    if (busca == 0)
+        printf("\nCansei, impossível fazer com Guloso\n");
+    else if (busca == 1)
+        printf("\nEncontrei\n");
     else 
-        printf("Alcance máximo atingido");
+        printf("\nCansei, impossível fazer com Guloso!\n");
     
 
     return 0;
