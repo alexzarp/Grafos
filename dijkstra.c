@@ -1,7 +1,7 @@
 //Esta tarefa é baseada no grafo https://github.com/alexzarp/Grafos/blob/main/resources/Capturar.PNG
 #include <stdio.h>
 #include <limits.h>
-//                                           vertice | visitado | distacia | anterior
+//                     vertice | visitado | distacia | anterior
 void dijkstra (int mat[7][7], int tabela[7][4], int nodoInicial) {
     int i = nodoInicial;
     tabela[i][2] = 0; //→ o primeiro nodo tem custo zero pois é o início
