@@ -10,27 +10,26 @@ struct Controle {
 typedef struct Controle controle;
 
 void printControle (controle *raiz) {
-    raiz = raiz->prox;
+    controle *p = raiz->prox;
     printf("Estado da fila:\n|");
-    
-    while (raiz->prox) {
-        printf(" %d |", raiz->valor);
-        raiz = raiz->prox;    
+    while (p != NULL) {
+        printf(" %d |", p->valor);
+        p = p->prox;    
     }
     printf("\n");
 }
 
-void insereFim (controle *raiz, int numero) {
-    controle *novo = (controle*) malloc(sizeof(controle));
-    novo->valor = numero;
+void insereFim(controle *raiz, int info){
+    controle *novo = NULL;
+    novo = (controle *)malloc(sizeof(controle *));
+    novo->valor = info;
     novo->prox = NULL;
 
-    controle *ultimo = raiz->prox;
+    controle *ultimo = raiz;
     while (ultimo->prox) {
         ultimo = ultimo->prox;
     }
     ultimo->prox = novo;
-    novo->prox = NULL;
 }
 
 void insereInicio (controle *raiz, int numero) {
@@ -50,7 +49,6 @@ int lePrimeiro (controle *raiz){
     controle *aux = raiz;
     aux = aux->prox;
     int value = aux->valor;
-    free(aux);
     return value;
 }
 
@@ -59,32 +57,50 @@ void bfs (int mat[7][7], int tabelaBFS[7][4], controle *fila, int tamanho, int o
     insereFim(fila, origem);
     int i = origem;
     tabelaBFS[i][1] = 0; //→ distancia 0
+    int contagemPassos = 0;
     while (i < tamanho){
         tabelaBFS[i][3]++; //→ gray
         printf("\nVisitando vértice %d", i);
         for(int j = 0; j < tamanho; j++){
             if ((mat[i][j] != 0) && (tabelaBFS[j][3] < 1)){
-                tabelaBFS[j][1]++;
+                tabelaBFS[j][1] = 1;
+                // for (int linha = i; linha < tamanho; linha++){
+                //     for (int coluna = j; coluna < 4; coluna++) {
+                //         if (tabelaBFS[linha][1] == INT_MAX) {
+                //             tabelaBFS[linha][1] = 1;
+                //         } else {
+                //             if (tabelaBFS[linha][2] == origem) 
+                //                 break;
+                //             else {
+                //                 tabelaBFS[linha][1]++;
+                //                 linha = tabelaBFS[linha][2];
+                //             } 
+                //         }
+                //     }
+                // }
                 tabelaBFS[j][2] = i;
-                tabelaBFS[j][3]++;
                 insereFim(fila, j);
+                tabelaBFS[j][3]++;
+            }
+            else if (mat[i][j] != 0 && tabelaBFS[j][3] < 2) {
+                tabelaBFS[j][1]++;
             }
         }
         tabelaBFS[i][3]++;
-//--------------Print da tabela-------------------
+//--------------Print da tabela--------------------------------------------
         printf("\nEstado atual\n");
         printf("vert\t|dist\t|ant\t|visit\n");
         for (int linha = 0; linha < tamanho; linha++){
             for (int coluna = 0; coluna < 4; coluna++){
         // Vertice 0| Distancia 1| Anterior 2| Visitado(cor)3
-        //vou desconsiderar a distância só porque não tenho distância ==1
-                if (tabelaBFS[linha][coluna] == INT_MAX && coluna == 1)
+        
+                if (tabelaBFS[linha][coluna] == INT_MAX || tabelaBFS[linha][coluna] == INT_MIN)
                     printf("∞\t|");
                 if ((tabelaBFS[linha][coluna] == 0) && (coluna == 3))
                     printf("bran\t|");
                 if ((tabelaBFS[linha][coluna] == 1) && (coluna == 3))
                     printf("cinz\t|");
-                if ((tabelaBFS[linha][coluna] == 2) && (coluna == 3))
+                if ((tabelaBFS[linha][coluna] > 1) && (coluna == 3))
                     printf("pret\t|");
                 else
                     printf("%d\t|", tabelaBFS[linha][coluna]);
@@ -93,19 +109,19 @@ void bfs (int mat[7][7], int tabelaBFS[7][4], controle *fila, int tamanho, int o
                 printf("← Visitando este vertice");
             printf("\n");
         }
-        // getchar();
-        // printf("Estado da fila:\n|");
-        // controle *primeiro = fila;
-        // while (primeiro->prox) {
-        //     printf(" %d |", fila->valor);
-        //     primeiro = primeiro->prox;    
-        // }
-        // printf("\n");
-        // getchar();
-        removePrimeiro(fila);
+//-------------------------------------------------------------------------
+        printControle(fila);
 
-        if (fila == NULL)
+        removePrimeiro(fila);
+        
+        if (destino == i){
+            printf("Vertice encontrado, interrompendo navegação\n");
             return;
+        }
+        else if (fila->prox == NULL){
+            printf("Não foi possível ligar-se ao vertice\n");
+            return;
+        }
 
         i = lePrimeiro(fila);
     }
@@ -133,20 +149,12 @@ int main() {//                     A  B  C  D  E  F  G
     };                                   // ↑ 0 = white, 1 = gray, 2 = black
     //essa é minha pilha
     controle *raiz = (controle*) malloc(sizeof(controle));
+    raiz->prox = NULL;
+    //raiz->valor = NULL;
     int origem, destino;
-    // printf("Qual origem destino: ");
-    // scanf("%d%d", &origem, &destino);
-    // bfs(matAdja, tabelaBFS, raiz, 7, origem, destino);
-
-    for (int w=0; w<4; w++){
-        scanf("%d", &origem);
-        insereFim(raiz, origem);
-    }
-    printControle(raiz);
-    printf("Remover: ");
-    scanf("%d", &destino);
-    removePrimeiro(raiz);
-    printControle(raiz);
-
+    printf("Qual origem destino: ");
+    scanf("%d%d", &origem, &destino);
+    bfs(matAdja, tabelaBFS, raiz, 7, origem, destino);
+    
     return 0;
 }
