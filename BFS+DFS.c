@@ -1,7 +1,7 @@
 //Esta tarefa é baseada no grafo https://github.com/alexzarp/Grafos/blob/main/resources/Capturar.PNG
 // Não tá funcionando e isso →não faz sentido←, dia 08/04/2021 irei no atendimento
 #include <stdio.h>
-#include <limits.h>
+//#include <limits.h>
 #include <stdlib.h>
 
 #define TAM 7
@@ -65,34 +65,18 @@ void printTabelaBFS(int tabelaBFS[TAM][4], int tamanho, int i) {
         if (tabelaBFS[linha][3] == 1)
             printf("%d\t|%d\t|%d\t|cinz\t|", tabelaBFS[linha][0], tabelaBFS[linha][1], tabelaBFS[linha][2]);
         if (tabelaBFS[linha][3] > 1)
-            printf("%d\t|%d\t|%d\t|pret\t|", tabelaBFS[linha][0], tabelaBFS[linha][1], tabelaBFS[linha][2]);
-
-        // if (coluna == 0)
-        //     printf("%d\t|", tabelaBFS[linha][coluna]);
-        // if (coluna == 1 && (tabelaBFS[linha][coluna] == INT_MAX || tabelaBFS[linha][coluna] == INT_MIN))
-        //     printf("∞\t|");
-        // if (coluna == 2)
-        //     printf("%d\t|", tabelaBFS[linha][coluna]);
-        // if (coluna == 3){
-        //     if (tabelaBFS[linha][coluna] == 0)
-        //         printf("bran\t|");
-        //     else if (tabelaBFS[linha][coluna] == 1)
-        //         printf("cinz\t|");
-        //     else if (tabelaBFS[linha][coluna] > 1)
-        //         printf("pret\t|");
-        // }
-        
+            printf("%d\t|%d\t|%d\t|pret\t|", tabelaBFS[linha][0], tabelaBFS[linha][1], tabelaBFS[linha][2]);        
         if ((linha == i) && (i > -1) && (i < tamanho))
             printf("← Visitando este vertice");
         printf("\n");
     }   
 }
 
-void printTabelaDFS(int tabelaDFS[TAM][5], int tamanho, int i) {//1
+void printTabelaDFS(int tabelaDFS[TAM][4], int tamanho, int i) {//1
     printf("\nEstado atual\n");
-    printf("vert\t|achad\t|prof\t|ante\t|visi\t|\n");
+    printf("vert\t|ini\t|fim\t|visit\t|\n");
     for (int linha = 0; linha < tamanho; linha++){//2
-        // Vertice  Momento_encotro  Momento_busca_completa  Anterior  Visitado
+        // Vertice0  Inicio1  Fim2  Cor3
         for (int coluna = 0; coluna < 5; coluna++){//3
             if (coluna == 0)
                 printf("%d\t|", tabelaDFS[linha][coluna]);
@@ -100,9 +84,7 @@ void printTabelaDFS(int tabelaDFS[TAM][5], int tamanho, int i) {//1
                 printf("%d\t|", tabelaDFS[linha][coluna]);
             if (coluna == 2)
                 printf("%d\t|", tabelaDFS[linha][coluna]);
-            if (coluna == 3)
-                printf("%d\t|", tabelaDFS[linha][coluna]);
-            if (coluna == 4){//4
+            if (coluna == 3){//4
                 if (tabelaDFS[linha][coluna] == 0)
                     printf("bran\t|");
                 else if (tabelaDFS[linha][coluna] == 1)
@@ -159,34 +141,34 @@ void bfs (int mat[TAM][TAM], int tabelaBFS[TAM][4], controle *fila, int tamanho,
     
 }
 
-void dfs (int mat[TAM][TAM], int tabelaDFS[TAM][5], controle *pilha, int tamanho, int origem, int destino) {
+void dfs (int mat[TAM][TAM], int tabelaDFS[TAM][4], controle *pilha, int tamanho, int origem, int destino) {
     insereInicio(pilha, origem);
     int i = origem;
-    int passos = 0;
-    tabelaDFS[i][1] = passos;//→ encontro no momento 1
+    int passos = 0; //não me lembro agora, mas vou deixar o primeiro passo como 0
+    tabelaDFS[i][1] = passos;//→ encontro no momento 0
+    tabelaDFS[i][3]++; //→ gray
     while (i < tamanho){
-        tabelaDFS[i][4]++; //→ gray
         printf("\nVisitando vértice %d", i);
-        // Vertice0  Encontrado1  Prundidade2  Anterior3  Visitado4
+        // Vertice0  Inicio1  Fim2  Cor3 = 0 1 2
         for(int j = 0; j < tamanho; j++){
-            if ((mat[i][j] != 0) && (tabelaDFS[j][4] < 1)){
+            if ((mat[i][j] != 0) && (tabelaDFS[j][3] < 1) && tabelaDFS[j][1] == -1){
                 passos++;
-                tabelaDFS[j][1] = passos;
-                tabelaDFS[j][3] = i;
-                tabelaDFS[j][4]++;
                 insereInicio(pilha, j);
+                // if (tabelaDFS[j][1] == -1)
+                    tabelaDFS[j][1] = passos;
+                tabelaDFS[j][3]++;
             }
-            else if (mat[i][j] != 0 && tabelaDFS[j][3] < 2) {
-                tabelaDFS[j][2]++;
+            if (mat[i][j] != 0 && tabelaDFS[j][3] > 2 && tabelaDFS[j][2] == -1) {
+                passos++;
+                // if (tabelaDFS[j][1] == -1)
+                    tabelaDFS[j][2] = passos;
+                tabelaDFS[j][3]++;
+                removePrimeiro(pilha);
             }
         }
-        tabelaDFS[i][4]++;
         printTabelaDFS (tabelaDFS, tamanho, i);
-
         printf("Estado da pilha:\n|");
         printControle(pilha);
-
-        removePrimeiro(pilha);
         
         if (destino == i){
             printf("Vertice encontrado, interrompendo navegação\n");
@@ -221,15 +203,15 @@ int main() {//                         A  B  C  D  E  F  G
                              {6, 0, -1, 0},
     };                                     // ↑ 0 = white, 1 = gray, 2 = black
 
-    // Vertice  Momento_encotro  Momento_busca_completa  Anterior  Visitado
-    int tabelaDFS[TAM][5] = {{0, 0, 0, -1, 0},
-                             {1, 0, 0, -1, 0},
-                             {2, 0, 0, -1, 0},
-                             {3, 0, 0, -1, 0},
-                             {4, 0, 0, -1, 0},
-                             {5, 0, 0, -1, 0},
-                             {6, 0, 0, -1, 0},
-    };                                  // ↑ 0 = white, 1 = gray, 2 = black
+                   // Vertice0  Inicio1  Fim2  Cor3
+    int tabelaDFS[TAM][4] = {{0, -1, -1, 0},
+                             {1, -1, -1, 0},
+                             {2, -1, -1, 0},
+                             {3, -1, -1, 0},
+                             {4, -1, -1, 0},
+                             {5, -1, -1, 0},
+                             {6, -1, -1, 0},
+    };                                // ↑ 0 = white, 1 = gray, 2 = black
 
     //essa é minha pilha ou fila
     controle *raiz = (controle*) malloc(sizeof(controle));
