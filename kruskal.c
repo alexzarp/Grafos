@@ -6,14 +6,14 @@ typedef struct {
 	int val;
 } Vertice;
 
-typedef struct Tabela{
-	int pesoAresta;
-	int verticei;
-	int verticej;
+// typedef struct Tabela{
+// 	int pesoAresta;
+// 	int verticei;
+// 	int verticej;
 
-	struct Tabela *prox;
-	//struct Tabela *ant;
-}tabela;
+// 	struct Tabela *prox;
+// 	//struct Tabela *ant;
+// }tabela;
 
 //lista duplamente encadeada com todos os vértices
 struct tp_list_vet {
@@ -24,6 +24,7 @@ struct tp_list_vet {
 typedef struct tp_list_vet ListaVertices;
 
 typedef struct {
+	int peso;
 	Vertice *origem;
 	Vertice *destino;
 } Aresta;
@@ -148,13 +149,14 @@ void insereVertice(Grafo *G, int val){
 /**
  * Nesta função havia um erro, não haviamos criado a aresta com dois vértices, e sim com dois int. Foi corrigido e há uma observação.
  */
-void insereAresta(Grafo *G, int origem, int destino){
+void insereAresta(Grafo *G, int origem, int destino, int peso){
 	Aresta *newA;
 	ListaArestas *auxA;
 	Vertice *o, *d;
 	
 	//Aresta
 	newA = malloc(sizeof(Aresta)); //Cria a Aresta
+	newA->peso = peso;
 	/**
 	 * Perceba que aqui estamos criando um novo vértice para representar a origem, 
 	 * 	poderiamos buscar um vértice já existente em nossa lista, e caso não encontrar apresentar um erro. 
