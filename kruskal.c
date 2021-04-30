@@ -2,19 +2,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int retornoGlobal[3];
+
+int leTabelaOrdenado (t *raiz, int i);
 typedef struct {
 	int val;
 } Vertice;
+//---------------------------------------
+struct Tabela {
+	int origem;
+	int peso;
+	int destino;
+	struct Tabela *prox;
+	struct Tabela *ant;
+};
+typedef struct Tabela t;
 
-// typedef struct Tabela{
-// 	int pesoAresta;
-// 	int verticei;
-// 	int verticej;
+int leTabelaOrdenado (t *raiz, int i) {
+	t *aux = raiz->prox;
+	int control = 0;
+	while (aux->prox) {
+		if (control == i) {
+			break;
+		}
+		control++;
+		aux = aux->prox;
+	}
+	retornoGlobal[0] = aux->origem;
+	retornoGlobal[1] = aux->peso;
+	retornoGlobal[2] = aux->destino;
+	return retornoGlobal;
+}
 
-// 	struct Tabela *prox;
-// 	//struct Tabela *ant;
-// }tabela;
+void insereTabelaDeArestas (int tabelaDeArestas[3][11], t *raiz) {
+	for (int i = 0; i < 11; i++) {
+		int ret[3] = leTabelaOrdenado(raiz, i);
+		tabelaDeArestas[0][i] = ret[0];
+		tabelaDeArestas[1][i] = ret[1];
+		tabelaDeArestas[2][i] = ret[2];
+	}
+}
 
+void insereTabelaOrdenado (t *raiz, int origem, int peso, int destino) {
+	t *novo = (t *) malloc (sizeof(t*));
+	novo->origem = origem;
+	novo->peso = peso;
+	novo->destino = destino;
+	novo->prox = NULL;
+	//novo->ant = NULL;
+
+	t *aux = raiz->prox;
+	while (aux->prox) {
+		if (aux->peso <= aux->prox->peso) 
+			break;
+	}
+	novo->prox = aux->prox;
+	aux->prox = novo;
+}
+
+
+//------------------------------------------
 //lista duplamente encadeada com todos os vértices
 struct tp_list_vet {
 	Vertice *v;
@@ -59,6 +106,17 @@ Grafo *inicializaGrafo(){
 	return G;
 }
 
+void liberaMemoriaLista (t *raiz) {
+	t *aux = raiz;
+
+	while (aux != NULL) {
+		aux = raiz->prox;
+		free(raiz);
+		raiz = aux;
+	}
+	free(aux);
+}
+
 void liberaMemoria(Grafo *G){
 	ListaVertices *auxV = G->primeiroV;
 	ListaArestas *auxA = G->primeiroA;
@@ -95,18 +153,20 @@ void imprimeListaVertices(Grafo *g){
 	printf("}\n");
 }
 
-void imprimeAresta(Grafo *g){
+void imprimeAresta(Grafo *g, t *r, int tabelaDeArestas[3][11]){
 	ListaArestas *aux = g->primeiroA;
 
 	printf("****** Lista de ListaArestas ********\n\t{");
 	while(aux != NULL){
-		printf("(%d,%d)", aux->e->origem->val, aux->e->destino->val);
+		printf("(%d)----%d----(%d)", aux->e->origem->val, aux->e->peso, aux->e->destino->val);
+		insereTabelaOrdenado(r, aux->e->origem->val, aux->e->peso, aux->e->destino->val);
 		if (aux != g->ultimoA){
 			printf(", ");
 		}
 		aux=aux->prox;
 	}
 	printf("}\n");
+	insereTabelaDeArestas (tabelaDeArestas, r);
 }
 
 Vertice *getVertice(Grafo *g, int valor){
@@ -186,11 +246,9 @@ void insereAresta(Grafo *G, int origem, int destino, int peso){
 		G->primeiroA = auxA;
 		G->ultimoA = auxA; 
 	} else { //faz o encadeamento
-		//printf("Não é o primeiro\n");
 		G->ultimoA->prox = auxA; //O proximo do ultimo ser o novo elemento
 		auxA->ant = G->ultimoA; //anterior do novo elemento ser o ultimo
 		G->ultimoA = auxA;  //o novo elemento vira o ultimo
-		//printf("Feito\n");
 	}
 }
 
@@ -219,12 +277,22 @@ void imprimeListaArestasDestino( Grafo *g, int valor){
 
 		aux = aux->prox;
 	}
-
 }
 
-// void kruskal (int mat[7][7]) {
+void printEstadoKruskal (int tabela) {
+	
+}
 
-// }
+// já não suporto mais :((, vou esfriar minha cabeça, isso não foi trivial dessa vez
+void kruskal (int tabelaDeArestas[3][11], int tabelaDeLigacao[2][7]) {
+	for (int i = 0; i < 11; i++) {
+		for (int j = 0; j < 7; j++) {
+			if (tabelaDeArestas[3][i] == )
+
+		}
+	}
+	
+}
 
 int main() {
     int matAdja[7][7] = {/*(0) A*/{0, 7, 0, 5, 0, 0, 0},
@@ -236,8 +304,17 @@ int main() {
                          /*(6) G*/{0, 0, 0, 0, 9,11, 0}          //20  21  22  23
     };                                                           //30  31  32  33
 
+	int tabelaDeArestas[3][11];// peso vi vj
+	int tabelaDeLigacao[2][7];
+	for (int i = 0; i < 7; i++){
+		tabelaDeLigacao[0][i] = i;
+		tabelaDeLigacao[1][i] = -1;
+	}
+
     Grafo *grafo = inicializaGrafo();
 
+	t *raiz = (t *) malloc(sizeof(t*));
+	raiz->prox = NULL;
 	
 	for (int j = 0; j < 7; j++)
 		insereVertice(grafo, j);
@@ -245,11 +322,12 @@ int main() {
     for (int i = 0; i < 7; i++)
 		for (int j = 0; j < 7; j++)
 			if (matAdja[i][j] != 0)
-				insereAresta(grafo, i, j);
+				insereAresta(grafo, i, j, matAdja[i][j]);
 
 	imprimeListaVertices(grafo);
-	imprimeAresta(grafo);
+	imprimeAresta(grafo, raiz, tabelaDeArestas);//incluir certo
 
 	liberaMemoria(grafo);
+	liberaMemoriaLista (raiz);
     return 0;
 }
