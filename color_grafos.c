@@ -2,11 +2,15 @@
 //1🔴 2⚫ 3🔵 4🟡
 //Modo sai colorindo com a cor que der
 //Esta tarefa é baseada no grafo https://github.com/alexzarp/Grafos/blob/main/resources/Capturar.PNG
+int maiorGrauNColorido (int tabela[7][3]);
+void medeGrau (int mat[7][7], int tabela[7][3]);
+void printTabela (int tabela[7][3]);
 
-void coloreGrafo (int mat[7][7], int tabela[7][2]) {
-    //vertice0 | cor1 |
-
-    for (int i = 0; i < 7; i++){
+void coloreGrafo (int mat[7][7], int tabela[7][3]) {
+    //vertice0 | cor1 | grau3
+    medeGrau(mat, tabela);
+    for (int i; i < 7; i++){
+        i = maiorGrauNColorido(tabela);
         tabela[i][1] = 1;
         for (int j = 0; j < 7; j++){
             if (mat[i][j] != 0) {
@@ -17,9 +21,10 @@ void coloreGrafo (int mat[7][7], int tabela[7][2]) {
             }
         }
     }
+    printTabela(tabela);
 }
 
-void printTabela (int tabela[7][2]) {
+void printTabela (int tabela[7][3]) {
     int num[4] = {0,0,0,0};
     int contagem = 0;
     printf("Reultado:\n");
@@ -59,49 +64,34 @@ void printTabela (int tabela[7][2]) {
 
         printf("\n");
     }
-    printf("\nNúmero de cores usadas: %d\n", contagem);
+    printf("Número de cores usadas: %d\n", contagem);
 }
 
-// void medeGrau (int mat[7][7], int tabela[7][3]){
-//     int grau;
-//     for (int i = 0; i < 7; i++){
-//         grau = 0;
-//         for (int j = 0; j < 7; j++){
-//             if (mat[i][j] != 0){
-//                 grau++;
-//                 // printf("Grau %d", grau);
-//             }
-//         }
-//         tabela[i][2] = grau;
-//     }
-// }
+int maiorGrauNColorido (int tabela[7][3]){
+    int maiorGrau = 0;
+    int retorno;
+    for(int i = 0; i < 7; i++){
+        if (maiorGrau < tabela[i][2] && tabela[i][1] == 0){
+            maiorGrau = tabela[i][2];
+            retorno = i;
+        }
+    }
+    return retorno;
+}
 
-//buble sort kibado diretamente dos trabalhos de POD
-// int bubblesort(int vet[7][3], int n){
-//     int flag=0;
-//     for(int i = n-1; i>=1; i--){
-//         flag=0;
-//         for(int j = 0; j<=i-1; j++){
-//             if(vet[j][2]>vet[j+1][2]){
-//                 int troca = vet[j][2];
-//                 int troca1 = vet[j][1];
-//                 int troca2 = vet[j][0];
-
-//                 vet[j][2] = vet[j+1][2];
-//                 vet[j][1] = vet[j+1][1];
-//                 vet[j][0] = vet[j+1][0];
-                
-//                 vet[j+1][2] = troca;
-//                 vet[j+1][1] = troca1;
-//                 vet[j+1][0] = troca2;
-//                 flag = 1;
-//             }
-//         }
-//         if(flag == 0){
-//             break;
-//         }
-//     }
-// }
+void medeGrau (int mat[7][7], int tabela[7][3]){
+    int grau;
+    for (int i = 0; i < 7; i++){
+        grau = 0;
+        for (int j = 0; j < 7; j++){
+            if (mat[i][j] != 0){
+                grau++;
+                // printf("Grau %d", grau);
+            }
+        }
+        tabela[i][2] = grau;
+    }
+}
 
 //                                (0)(1)(2)(3)(4)(5)(6)
 int main() {//                     A  B  C  D  E  F  G
@@ -115,22 +105,21 @@ int main() {//                     A  B  C  D  E  F  G
     };                                                           //30  31  32  33
 
     //vertice | cor |
-    int tabelaColoracao[7][2] = {
-        {0,0},
-        {1,0},
-        {2,0},
-        {3,0},
-        {4,0},
-        {5,0},
-        {6,0}
+    int tabelaColoracao[7][3] = {
+        {0,0,0},
+        {1,0,0},
+        {2,0,0},
+        {3,0,0},
+        {4,0,0},
+        {5,0,0},
+        {6,0,0}
     };
-
-    //medeGrau(matAdja, tabelaColoracao);
-    //bubblesort(tabelaColoracao, 7);
     coloreGrafo(matAdja, tabelaColoracao);
-    printTabela(tabelaColoracao);
-
     // for (int i = 0; i< 7; i++){
-    //     printf("Grau de %d = %d\n", tabelaColoracao[i][0], tabelaColoracao[i][1]);
+    //     printf("Grau de %d = %d\n", tabelaColoracao[i][0], tabelaColoracao[i][2]);
     // }
+    // int c = maiorGrauNColorido(tabelaColoracao);
+    // printf("%d\n", c);
+    // printTabela(tabelaColoracao);
+
 }
