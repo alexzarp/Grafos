@@ -86,7 +86,6 @@ void medeGrau (int mat[7][7], int tabela[7][3]){
         for (int j = 0; j < 7; j++){
             if (mat[i][j] != 0){
                 grau++;
-                // printf("Grau %d", grau);
             }
         }
         tabela[i][2] = grau;
@@ -104,7 +103,7 @@ int main() {//                     A  B  C  D  E  F  G
                          /*(6) G*/{0, 0, 0, 0, 9,11, 0}          //20  21  22  23
     };                                                           //30  31  32  33
 
-    //vertice | cor |
+    //vertice | cor | grau
     int tabelaColoracao[7][3] = {
         {0,0,0},
         {1,0,0},
@@ -114,12 +113,6 @@ int main() {//                     A  B  C  D  E  F  G
         {5,0,0},
         {6,0,0}
     };
-    coloreGrafo(matAdja, tabelaColoracao);
-    // for (int i = 0; i< 7; i++){
-    //     printf("Grau de %d = %d\n", tabelaColoracao[i][0], tabelaColoracao[i][2]);
-    // }
-    // int c = maiorGrauNColorido(tabelaColoracao);
-    // printf("%d\n", c);
-    // printTabela(tabelaColoracao);
 
+    coloreGrafo(matAdja, tabelaColoracao);
 }
